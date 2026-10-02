@@ -26,7 +26,7 @@ internal static class LinuxBotOffsets
 public class BotAI : BasePlugin
 {
     public override string ModuleName => "Patches - Bot AI";
-    public override string ModuleVersion => "1.8.9";
+    public override string ModuleVersion => "1.8.10";
     public override string ModuleAuthor => "K4ryuu & Austin (updated by ed0ard & Misaka17032 & XBribo & AmagiReina)";
     public override string ModuleDescription =>
         "Improve and fix bots' behavior comprehensively";
@@ -118,7 +118,9 @@ public class BotAI : BasePlugin
 
         // Keep the spawn compensation paired with the Linux GameState_Reset patch.
         // The removed Windows patch changed a bomb-pickup update, not Reset;
-        // Windows keeps native state handling and needs no raw spawn-time write.
+        // Windows m_gameState is +0x5120; +0x5128 is its m_isRoundOver field.
+        // Keep native Reset and avoid the unnecessary raw spawn-time write.
+        // Evidence: docs/windows-patch-audit.txt.
         if (_isLinux)
         {
             RegisterEventHandler<EventPlayerSpawn>((@event, info) =>
